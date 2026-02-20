@@ -1,7 +1,8 @@
-# 07 — Fase Futura: Camada de IA
+# 07 — Fase 8: Camada de IA (WhatsApp Inteligente)
 
-> **Status:** 🔮 Futuro — implementar somente após o MVP estar estável em produção  
-> **Prazo estimado:** 3–6 meses após o MVP  
+> **Status:** � Implementar após Fase 7 (Calendário) estar estável  
+> **Posição no roadmap:** Fase 8 de 10 — ver `AGENT-DIRECTOR.md`  
+> **Motivo do posicionamento:** Todos os serviços (WhatsApp, billing, scheduler, clientes, notas, calendário) precisam existir e estar testados antes da IA poder orquestrá-los  
 > **Custo adicional:** ~US$ 2–5/mês (OpenAI API com volume de uso pessoal)
 
 ---
@@ -106,11 +107,11 @@ fastify.post('/webhook/whatsapp', async (req, reply) => {
 ### Configurar o Webhook na Evolution API
 
 ```bash
-curl -X POST "https://api.itaflix.com.br/webhook/set/itaflix" \
+curl -X POST "https://api.wapassist.com.br/webhook/set/wapassist" \
   -H "Content-Type: application/json" \
   -H "apikey: SUA_CHAVE" \
   -d '{
-    "url": "https://itaflix-api.onrender.com/api/webhook/whatsapp",
+    "url": "https://wapassist-api.onrender.com/api/webhook/whatsapp",
     "webhook_by_events": false,
     "events": ["MESSAGES_UPSERT"]
   }'
@@ -162,7 +163,7 @@ import { calculateNewDueDate, getPlanLabel }        from './billing.js';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM_PROMPT = `
-Você é o assistente do Itaflix, sistema de gestão de assinaturas IPTV.
+Você é o assistente do wapassist, sistema de gestão de assinaturas IPTV.
 Analise a mensagem do usuário e retorne um JSON com a intenção identificada.
 
 Intenções possíveis:

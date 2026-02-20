@@ -28,7 +28,7 @@
 
 1. No painel MP, vá em **Seu negócio > Configurações > Notificações (Webhooks)**
 2. Clique em **Adicionar nova URL de webhook**
-3. URL: `https://itaflix-api.onrender.com/api/webhook/mercadopago`
+3. URL: `https://wapassist-api.onrender.com/api/webhook/mercadopago`
 4. Evento: **Pagamentos**
 5. Salve e copie o **secret** gerado — ele vai para `MP_WEBHOOK_SECRET` no `.env`
 
@@ -37,7 +37,7 @@
 ### Checklist
 
 - [ ] Webhook cadastrado no painel do Mercado Pago
-- [ ] URL aponta para `https://itaflix-api.onrender.com/api/webhook/mercadopago`
+- [ ] URL aponta para `https://wapassist-api.onrender.com/api/webhook/mercadopago`
 - [ ] Evento configurado: **Pagamentos**
 - [ ] `MP_WEBHOOK_SECRET` copiado e preenchido no `.env`
 
@@ -51,7 +51,7 @@ Cada cobrança gera um link Pix **personalizado por cliente**. O campo `external
 [Scheduler D-1]
     │
     ├── Cria Preference no Mercado Pago
-    │     ├── title: "Itaflix - Renovação Mensal"
+    │     ├── title: "wapassist - Renovação Mensal"
     │     ├── amount: 30.00
     │     ├── external_reference: "5521999998888"  ← telefone do cliente
     │     └── expiration: +48 horas
@@ -89,7 +89,7 @@ MP chama POST /api/webhook/mercadopago
 Para testar se o backend processa o webhook corretamente:
 
 ```bash
-curl -X POST https://itaflix-api.onrender.com/api/webhook/mercadopago \
+curl -X POST https://wapassist-api.onrender.com/api/webhook/mercadopago \
   -H "Content-Type: application/json" \
   -d '{"type": "payment", "data": {"id": "ID_DO_PAGAMENTO_REAL"}}'
 ```
@@ -121,7 +121,7 @@ Todos os templates são definidos em `src/services/whatsapp.js`. Abaixo estão o
 ```
 Olá, *{NOME}*! 👋
 
-Sua assinatura *Itaflix* vence amanhã, *{DATA}*.
+Sua assinatura *wapassist* vence amanhã, *{DATA}*.
 
 Para renovar, pague o Pix abaixo:
 💰 Valor: R$ {VALOR}
@@ -147,7 +147,7 @@ Recebemos seu pagamento com sucesso.
 📦 Plano: {PLANO}
 
 Bom entretenimento! 🎬
-— Equipe Itaflix
+— Equipe wapassist
 ```
 
 ---
@@ -157,7 +157,7 @@ Bom entretenimento! 🎬
 **Enviada para o WhatsApp do cliente quando ele passa 3 dias em atraso**
 
 ```
-⏰ *Itaflix — Assinatura em atraso*
+⏰ *wapassist — Assinatura em atraso*
 
 Olá, *{NOME}*!
 
@@ -166,7 +166,7 @@ Sua assinatura está em atraso há *{DIAS} dias* (venceu em {DATA_VENCIMENTO}).
 Para regularizar, entre em contato ou aguarde a próxima cobrança automática.
 
 Qualquer dúvida é só chamar! 😊
-— Equipe Itaflix
+— Equipe wapassist
 ```
 
 > ℹ️ O admin **não recebe WhatsApp** nesse evento. A notificação para o admin é exibida apenas na **dashboard** (painel de alertas da tela Visão Geral), consumida via `GET /api/dashboard/summary` → campo `alerts`.
@@ -194,11 +194,11 @@ Se `connected: false`, o admin precisa reescanear o QR Code na VPS:
 
 ```bash
 # Na VPS, deletar a sessão atual
-curl -X DELETE "https://api.itaflix.com.br/instance/logout/itaflix" \
+curl -X DELETE "https://api.wapassist.com.br/instance/logout/wapassist" \
   -H "apikey: SUA_CHAVE"
 
 # Recriar e obter novo QR Code
-curl -X POST "https://api.itaflix.com.br/instance/connect/itaflix" \
+curl -X POST "https://api.wapassist.com.br/instance/connect/wapassist" \
   -H "apikey: SUA_CHAVE"
 ```
 
@@ -224,7 +224,7 @@ curl -X POST "https://api.itaflix.com.br/instance/connect/itaflix" \
 - [ ] Webhook do MP cadastrado e apontando para o backend
 - [ ] `MP_WEBHOOK_SECRET` configurado no `.env`
 - [ ] Evolution API rodando na VPS (ver `01-INFRASTRUCTURE.md`)
-- [ ] Instância `itaflix` criada e WhatsApp conectado (status `open`)
+- [ ] Instância `wapassist` criada e WhatsApp conectado (status `open`)
 - [ ] `EVOLUTION_APIKEY`, `EVOLUTION_URL`, `EVOLUTION_INSTANCE` configurados no `.env`
 - [ ] `ADMIN_PHONE` configurado com seu número pessoal
 - [ ] Mensagem de teste enviada com sucesso via WhatsApp

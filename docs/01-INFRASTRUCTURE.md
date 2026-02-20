@@ -2,7 +2,7 @@
 
 > **Objetivo:** Configurar a VPS com Ubuntu 22.04, Docker, Nginx, SSL e a Evolution API para envio de mensagens WhatsApp.  
 > **Tempo estimado:** 2–3 horas  
-> **Pré-requisito:** Domínio `itaflix.com.br` com acesso ao painel DNS.
+> **Pré-requisito:** Domínio `wapassist.com.br` com acesso ao painel DNS.
 
 ---
 
@@ -12,7 +12,7 @@
 Internet
     │
     ▼
-[DNS: api.itaflix.com.br → IP da VPS]
+[DNS: api.wapassist.com.br → IP da VPS]
     │
     ▼
 [VPS Ubuntu 22.04]
@@ -53,7 +53,7 @@ A VPS hospeda **somente** a Evolution API. O backend e o frontend ficam em servi
 
 ## Etapa 1.2 — Apontar DNS
 
-No painel do domínio `itaflix.com.br`, criar o registro:
+No painel do domínio `wapassist.com.br`, criar o registro:
 
 | Tipo | Nome | Valor | TTL |
 |---|---|---|---|
@@ -63,7 +63,7 @@ No painel do domínio `itaflix.com.br`, criar o registro:
 
 ### Checklist
 
-- [ ] Registro DNS tipo A criado: `api.itaflix.com.br → IP_DA_VPS`
+- [ ] Registro DNS tipo A criado: `api.wapassist.com.br → IP_DA_VPS`
 - [ ] Propagação confirmada no dnschecker.org
 
 ---
@@ -172,7 +172,7 @@ Cole o conteúdo:
 ```nginx
 server {
     listen 80;
-    server_name api.itaflix.com.br;
+    server_name api.wapassist.com.br;
     location / {
         proxy_pass http://localhost:8080;
         proxy_http_version 1.1;
@@ -189,35 +189,35 @@ server {
 ```bash
 ln -s /etc/nginx/sites-available/evolution /etc/nginx/sites-enabled/
 nginx -t && systemctl reload nginx
-certbot --nginx -d api.itaflix.com.br --email SEU@EMAIL.COM --agree-tos --non-interactive
+certbot --nginx -d api.wapassist.com.br --email SEU@EMAIL.COM --agree-tos --non-interactive
 ```
 
 ### Checklist
 
 - [ ] Nginx configurado como proxy reverso para porta 8080
 - [ ] `nginx -t` retorna `syntax is ok`
-- [ ] SSL ativo: `https://api.itaflix.com.br` abre sem alertas de segurança
+- [ ] SSL ativo: `https://api.wapassist.com.br` abre sem alertas de segurança
 - [ ] Certbot configurado para renovação automática
 
 ---
 
 ## Etapa 1.6 — Conectar WhatsApp via QR Code
 
-> ⚠️ **Use um número dedicado para o Itaflix — NÃO o seu número pessoal.**
+> ⚠️ **Use um número dedicado para o wapassist — NÃO o seu número pessoal.**
 
 ### Criar a instância
 
 ```bash
-curl -X POST https://api.itaflix.com.br/instance/create \
+curl -X POST https://api.wapassist.com.br/instance/create \
   -H "Content-Type: application/json" \
   -H "apikey: SUA_CHAVE" \
-  -d '{"instanceName": "itaflix", "qrcode": true}'
+  -d '{"instanceName": "wapassist", "qrcode": true}'
 ```
 
 ### Obter o QR Code
 
 ```bash
-curl -X GET "https://api.itaflix.com.br/instance/connect/itaflix" \
+curl -X GET "https://api.wapassist.com.br/instance/connect/wapassist" \
   -H "apikey: SUA_CHAVE"
 ```
 
@@ -230,7 +230,7 @@ A resposta contém um campo `base64` com a imagem do QR Code.
 ### Verificar conexão
 
 ```bash
-curl -X GET "https://api.itaflix.com.br/instance/fetchInstances" \
+curl -X GET "https://api.wapassist.com.br/instance/fetchInstances" \
   -H "apikey: SUA_CHAVE"
 ```
 
@@ -239,15 +239,15 @@ O campo `state` deve retornar `open`.
 ### Enviar mensagem de teste
 
 ```bash
-curl -X POST "https://api.itaflix.com.br/message/sendText/itaflix" \
+curl -X POST "https://api.wapassist.com.br/message/sendText/wapassist" \
   -H "Content-Type: application/json" \
   -H "apikey: SUA_CHAVE" \
-  -d '{"number": "5521999998888", "text": "Teste Itaflix funcionando!"}'
+  -d '{"number": "5521999998888", "text": "Teste wapassist funcionando!"}'
 ```
 
 ### Checklist
 
-- [ ] Instância `itaflix` criada na Evolution API
+- [ ] Instância `wapassist` criada na Evolution API
 - [ ] QR Code escaneado com número dedicado
 - [ ] Status da instância: `open`
 - [ ] Mensagem de teste recebida no WhatsApp
@@ -265,7 +265,7 @@ curl -X POST "https://api.itaflix.com.br/message/sendText/itaflix" \
 ### Reescanear QR Code (quando necessário)
 
 ```bash
-curl -X DELETE "https://api.itaflix.com.br/instance/logout/itaflix" \
+curl -X DELETE "https://api.wapassist.com.br/instance/logout/wapassist" \
   -H "apikey: SUA_CHAVE"
 # Depois repita o processo da Etapa 1.6
 ```

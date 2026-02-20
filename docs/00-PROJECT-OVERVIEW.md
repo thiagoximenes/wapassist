@@ -1,13 +1,13 @@
-# Itaflix — Visão Geral do Projeto
+# wapassist — Visão Geral do Projeto
 
 > **Sistema de Gestão de Assinaturas IPTV**  
 > Dashboard web privada para gerenciar clientes, cobranças automáticas via Pix e notificações via WhatsApp.
 
 ---
 
-## O que é o Itaflix?
+## O que é o wapassist?
 
-O Itaflix é uma aplicação web **privada e de uso pessoal** para gerenciar uma operação de IPTV com ~30 clientes (meta: 100). O dono da operação é o único usuário da dashboard. O sistema automatiza:
+O wapassist é uma aplicação web **privada e de uso pessoal** para gerenciar uma operação de IPTV com ~30 clientes (meta: 100). O dono da operação é o único usuário da dashboard. O sistema automatiza:
 
 - Cobrança via WhatsApp com link Pix (D-1 antes do vencimento)
 - Confirmação de pagamento automática via webhook do Mercado Pago
@@ -110,8 +110,8 @@ SE cliente pagou DEPOIS do vencimento:
 O projeto é dividido em **dois repositórios GitHub separados**:
 
 ```
-itaflix-api/          → Backend (Node.js + Fastify + Prisma)
-itaflix-dashboard/    → Frontend (React + Vite + TailwindCSS)
+wapassist-api/          → Backend (Node.js + Fastify + Prisma)
+wapassist-dashboard/    → Frontend (React + Vite + TailwindCSS)
 ```
 
 ---
@@ -120,9 +120,9 @@ itaflix-dashboard/    → Frontend (React + Vite + TailwindCSS)
 
 | Subdomínio | Destino | Função |
 |---|---|---|
-| `api.itaflix.com.br` | VPS (Nginx → Evolution API porta 8080) | WhatsApp API |
-| `admin.itaflix.com.br` | Vercel (frontend) | Dashboard admin |
-| `itaflix-api.onrender.com` | Render (backend) | API REST + webhooks |
+| `api.wapassist.com.br` | VPS (Nginx → Evolution API porta 8080) | WhatsApp API |
+| `admin.wapassist.com.br` | Vercel (frontend) | Dashboard admin |
+| `wapassist-api.onrender.com` | Render (backend) | API REST + webhooks |
 
 ---
 
@@ -132,7 +132,7 @@ Todas as variáveis necessárias para o backend (`.env`):
 
 ```env
 # Banco de dados
-DATABASE_URL=postgresql://usuario:senha@host.neon.tech/itaflix?sslmode=require
+DATABASE_URL=postgresql://usuario:senha@host.neon.tech/wapassist?sslmode=require
 
 # Autenticação
 JWT_SECRET=<openssl rand -hex 32>
@@ -143,20 +143,20 @@ MP_ACCESS_TOKEN=<token de PRODUÇÃO — começa com APP_USR->
 MP_WEBHOOK_SECRET=<secret gerado no painel MP>
 
 # Evolution API (WhatsApp)
-EVOLUTION_URL=https://api.itaflix.com.br
+EVOLUTION_URL=https://api.wapassist.com.br
 EVOLUTION_APIKEY=<chave gerada no docker-compose>
-EVOLUTION_INSTANCE=itaflix
+EVOLUTION_INSTANCE=wapassist
 ADMIN_PHONE=<seu número: 5521999998888>
 
 # App
 PORT=3000
-FRONTEND_URL=https://admin.itaflix.com.br
+FRONTEND_URL=https://admin.wapassist.com.br
 ```
 
 Variável necessária para o frontend (`.env.local`):
 
 ```env
-VITE_API_URL=https://itaflix-api.onrender.com
+VITE_API_URL=https://wapassist-api.onrender.com
 ```
 
 ---

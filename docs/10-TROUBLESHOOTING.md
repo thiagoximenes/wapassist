@@ -1,6 +1,6 @@
 # 10 — Solução de Problemas Comuns
 
-> Referência rápida para os problemas mais frequentes durante o desenvolvimento e operação do Itaflix.
+> Referência rápida para os problemas mais frequentes durante o desenvolvimento e operação do wapassist.
 
 ---
 
@@ -12,7 +12,7 @@
 **Causa:** O plano gratuito do Render hiberna após 15 minutos sem requisições. O webhook do MP chega durante a hibernação e é perdido.
 
 **Solução:**
-1. Configure o UptimeRobot para pingar `https://itaflix-api.onrender.com/health` a cada 5 minutos (ver `08-DEPLOY.md`)
+1. Configure o UptimeRobot para pingar `https://wapassist-api.onrender.com/health` a cada 5 minutos (ver `08-DEPLOY.md`)
 2. Alternativa: upgrade para o plano Starter do Render (US$ 7/mês)
 
 ---
@@ -25,14 +25,14 @@
 **Diagnóstico:**
 ```bash
 # Testar se o endpoint está acessível
-curl -X POST https://itaflix-api.onrender.com/api/webhook/mercadopago \
+curl -X POST https://wapassist-api.onrender.com/api/webhook/mercadopago \
   -H "Content-Type: application/json" \
   -d '{"type": "test"}'
 # Esperado: { "ok": true }
 ```
 
 **Soluções:**
-- Confirmar que a URL no painel do MP está correta: `https://itaflix-api.onrender.com/api/webhook/mercadopago`
+- Confirmar que a URL no painel do MP está correta: `https://wapassist-api.onrender.com/api/webhook/mercadopago`
 - Verificar se o backend está acordado (acessar `/health` primeiro)
 - Verificar nos logs do Render se há erros de inicialização
 
@@ -46,7 +46,7 @@ curl -X POST https://itaflix-api.onrender.com/api/webhook/mercadopago \
 **Diagnóstico:**
 ```bash
 # Verificar status da instância
-curl -X GET "https://api.itaflix.com.br/instance/fetchInstances" \
+curl -X GET "https://api.wapassist.com.br/instance/fetchInstances" \
   -H "apikey: SUA_CHAVE"
 # Verificar se state = "open"
 ```
@@ -130,7 +130,7 @@ console.log(r2); // Esperado: 2025-04-19
 
 **Solução:**
 ```env
-DATABASE_URL=postgresql://usuario:senha@host.neon.tech/itaflix?sslmode=require
+DATABASE_URL=postgresql://usuario:senha@host.neon.tech/wapassist?sslmode=require
 ```
 
 ---
@@ -157,7 +157,7 @@ npx prisma generate
 **Soluções:**
 - Manter o celular sempre carregado e com internet estável
 - **Não usar** o mesmo número no WhatsApp Web enquanto a Evolution API estiver ativa
-- Considerar usar um celular dedicado apenas para o Itaflix
+- Considerar usar um celular dedicado apenas para o wapassist
 
 ---
 
@@ -207,7 +207,7 @@ SELECT phone FROM "Client" WHERE name = 'Nome do Cliente';
 **Diagnóstico:**
 1. Abrir o DevTools do navegador (F12) → aba **Network**
 2. Verificar se as requisições para a API estão retornando erro
-3. Testar manualmente: `curl https://itaflix-api.onrender.com/health`
+3. Testar manualmente: `curl https://wapassist-api.onrender.com/health`
 
 **Soluções:**
 - Verificar se `VITE_API_URL` na Vercel aponta para a URL correta do Render
@@ -258,7 +258,7 @@ SELECT phone FROM "Client" WHERE name = 'Nome do Cliente';
 
 Quando algo não funcionar, verificar nesta ordem:
 
-1. [ ] Backend está acordado? → `curl https://itaflix-api.onrender.com/health`
+1. [ ] Backend está acordado? → `curl https://wapassist-api.onrender.com/health`
 2. [ ] WhatsApp conectado? → Verificar indicador na sidebar da dashboard
 3. [ ] Banco ativo? → Tentar acessar a lista de clientes na dashboard
 4. [ ] Variáveis de ambiente corretas? → Verificar no painel do Render

@@ -9,15 +9,15 @@
 
 > Tudo que precisa ser criado/contratado antes de escrever uma linha de código.
 
-- [ ] **Domínio `itaflix.com.br`** — acesso ao painel DNS confirmado
+- [ ] **Domínio `wapassist.com.br`** — acesso ao painel DNS confirmado
 - [ ] **VPS contratada** — Ubuntu 22.04 LTS, mínimo 2 GB RAM (Hostinger KVM 1 ou Hetzner CX11)
-- [ ] **Conta GitHub** — dois repositórios criados: `itaflix-api` e `itaflix-dashboard`
-- [ ] **Conta Neon.tech** — projeto `itaflix` criado na região `sa-east-1`
+- [ ] **Conta GitHub** — dois repositórios criados: `wapassist-api` e `wapassist-dashboard`
+- [ ] **Conta Neon.tech** — projeto `wapassist` criado na região `sa-east-1`
 - [ ] **Conta Render** — conta gratuita criada
 - [ ] **Conta Vercel** — conta gratuita criada
 - [ ] **Conta Mercado Pago** — conta de vendedor criada, Access Token de produção copiado
 - [ ] **Conta UptimeRobot** — conta gratuita criada
-- [ ] **Número WhatsApp dedicado** — número separado do pessoal para o Itaflix
+- [ ] **Número WhatsApp dedicado** — número separado do pessoal para o wapassist
 
 ---
 
@@ -36,7 +36,7 @@
 
 ### 1.2 — DNS
 
-- [ ] Registro DNS tipo A criado: `api.itaflix.com.br → IP_DA_VPS`
+- [ ] Registro DNS tipo A criado: `api.wapassist.com.br → IP_DA_VPS`
 - [ ] Propagação confirmada no dnschecker.org
 
 ### 1.3 — Evolution API
@@ -50,11 +50,11 @@
 
 - [ ] Nginx configurado como proxy reverso para porta 8080
 - [ ] `nginx -t` retorna `syntax is ok`
-- [ ] SSL ativo: `https://api.itaflix.com.br` abre sem alertas de segurança
+- [ ] SSL ativo: `https://api.wapassist.com.br` abre sem alertas de segurança
 
 ### 1.5 — WhatsApp
 
-- [ ] Instância `itaflix` criada na Evolution API
+- [ ] Instância `wapassist` criada na Evolution API
 - [ ] QR Code escaneado com número dedicado
 - [ ] Status da instância: `open`
 - [ ] Mensagem de teste recebida no WhatsApp
@@ -65,7 +65,7 @@
 
 > Referência: `02-DATABASE.md`
 
-- [ ] Projeto `itaflix` criado no Neon.tech (região `sa-east-1`)
+- [ ] Projeto `wapassist` criado no Neon.tech (região `sa-east-1`)
 - [ ] Connection String copiada e salva com segurança
 - [ ] `DATABASE_URL` preenchida no `.env` do backend
 - [ ] Schema Prisma completo criado em `prisma/schema.prisma`
@@ -82,7 +82,7 @@
 
 ### 3.1 — Setup
 
-- [ ] Projeto `itaflix-api` criado com `npm init -y`
+- [ ] Projeto `wapassist-api` criado com `npm init -y`
 - [ ] Todas as dependências instaladas (Fastify, Prisma, node-cron, axios, mercadopago, etc.)
 - [ ] `"type": "module"` adicionado ao `package.json`
 - [ ] Estrutura de pastas criada (`src/routes/`, `src/services/`, `src/middleware/`)
@@ -195,10 +195,10 @@
 
 > Referência: `08-DEPLOY.md`
 
-- [ ] Repositório `itaflix-api` commitado e no GitHub
-- [ ] Repositório `itaflix-dashboard` commitado e no GitHub
+- [ ] Repositório `wapassist-api` commitado e no GitHub
+- [ ] Repositório `wapassist-dashboard` commitado e no GitHub
 - [ ] Backend deployado no Render com todas as variáveis de ambiente
-- [ ] `GET https://itaflix-api.onrender.com/health` retorna `{ status: 'ok' }`
+- [ ] `GET https://wapassist-api.onrender.com/health` retorna `{ status: 'ok' }`
 - [ ] Frontend deployado na Vercel com `VITE_API_URL` configurada
 - [ ] Dashboard acessível pela URL da Vercel
 - [ ] UptimeRobot configurado pingando `/health` a cada 5 minutos
@@ -221,17 +221,7 @@
 
 ---
 
-## Fase 8 — Migração dos Clientes Reais
-
-- [ ] Listar todos os clientes atuais com nome, telefone, plano e data de vencimento
-- [ ] Cadastrar todos os clientes na dashboard (pode ser feito em lotes)
-- [ ] Verificar se as datas de vencimento estão corretas
-- [ ] Confirmar que o scheduler vai disparar cobranças na data correta
-- [ ] Sistema em produção com clientes reais ✅
-
----
-
-## Fase 9 — Calendário (após MVP estável)
+## Fase 8 — Calendário
 
 > Referência: `06-CALENDAR.md`
 
@@ -248,18 +238,29 @@
 
 ---
 
-## Fase 10 — IA (futuro, 3–6 meses)
+## Fase 9 — IA (WhatsApp Inteligente)
 
-> Referência: `07-PHASE-AI.md`
+> Referência: `07-PHASE-AI.md`  
+> **Pré-requisito humano:** Conta OpenAI criada com créditos (ver `HUMAN-SETUP.md` Bloco 7)
 
-- [ ] Conta OpenAI criada e `OPENAI_API_KEY` obtida
-- [ ] `MY_WHATSAPP` configurado no `.env`
-- [ ] Webhook de mensagens recebidas configurado na Evolution API
-- [ ] Rota `POST /api/webhook/whatsapp` implementada
-- [ ] Serviço Whisper para transcrição de áudio implementado
-- [ ] `src/services/aiAssistant.js` com todos os intents implementado
-- [ ] Teste end-to-end: enviar comando de texto via WhatsApp e receber resposta
-- [ ] Teste end-to-end: enviar áudio com comando e receber resposta
+- [ ] `OPENAI_API_KEY` e `MY_WHATSAPP` adicionados ao `.env` no Render
+- [ ] `src/services/whisper.js` — transcrição de áudio implementada
+- [ ] `src/services/aiAssistant.js` — todos os intents implementados
+- [ ] `src/routes/whatsapp.js` — webhook de mensagens recebidas
+- [ ] Webhook configurado na Evolution API apontando para o backend
+- [ ] Teste: enviar "listar clientes" via WhatsApp → receber resposta
+- [ ] Teste: enviar áudio com comando → receber resposta transcrita e executada
+- [ ] Teste: criar lembrete via WhatsApp → receber notificação no horário
+
+---
+
+## Fase 10 — Migração dos Clientes Reais
+
+- [ ] Listar todos os clientes atuais com nome, telefone, plano e data de vencimento
+- [ ] Cadastrar todos os clientes na dashboard (pode ser feito em lotes via CSV — ver `11-IMPROVEMENTS.md` C1)
+- [ ] Verificar se as datas de vencimento estão corretas
+- [ ] Confirmar que o scheduler vai disparar cobranças na data correta
+- [ ] Sistema em produção com clientes reais ✅
 
 ---
 
@@ -267,16 +268,16 @@
 
 | Fase | Status | Observações |
 |---|---|---|
-| Fase 0 — Pré-requisitos | ⬜ Pendente | |
+| Fase 0 — Pré-requisitos (`HUMAN-SETUP.md`) | ⬜ Pendente | |
 | Fase 1 — Infraestrutura | ⬜ Pendente | |
 | Fase 2 — Banco de Dados | ⬜ Pendente | |
-| Fase 3 — Backend | ⬜ Pendente | |
-| Fase 4 — Frontend | ⬜ Pendente | |
-| Fase 5 — Integrações | ⬜ Pendente | |
-| Fase 6 — Deploy | ⬜ Pendente | |
-| Fase 7 — Validação | ⬜ Pendente | |
-| Fase 8 — Migração | ⬜ Pendente | |
-| Fase 9 — Calendário | ⬜ Pendente | |
-| Fase 10 — IA | ⬜ Pendente | |
+| Fase 3 — Backend Core | ⬜ Pendente | |
+| Fase 4 — Integrações | ⬜ Pendente | |
+| Fase 5 — Frontend Base | ⬜ Pendente | |
+| Fase 6 — Frontend Telas | ⬜ Pendente | |
+| Fase 7 — Deploy + Validação | ⬜ Pendente | |
+| Fase 8 — Calendário | ⬜ Pendente | |
+| Fase 9 — IA (WhatsApp Inteligente) | ⬜ Pendente | |
+| Fase 10 — Migração de Clientes | ⬜ Pendente | |
 
 > Atualize a coluna **Status** com: ⬜ Pendente / 🔨 Em andamento / ✅ Concluído

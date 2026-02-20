@@ -195,7 +195,7 @@ export async function sendEventNotification(event) {
     case 'BILLING':
       // Enviada para o CLIENTE
       await sendMessage(event.client.phone,
-        `💳 *Itaflix — Cobrança*\n\n` +
+        `💳 *wapassist — Cobrança*\n\n` +
         `Olá, *${event.client.name}*!\n` +
         `Sua assinatura vence amanhã, *${date}*.\n\n` +
         `💰 Valor: R$ ${event.amount}\n` +

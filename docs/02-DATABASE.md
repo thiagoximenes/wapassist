@@ -18,13 +18,13 @@
 ## Etapa 2.1 — Criar a Conta e o Banco
 
 1. Acesse [neon.tech](https://neon.tech) e crie uma conta gratuita (login com Google funciona)
-2. Clique em **New Project** e nomeie como `itaflix`
+2. Clique em **New Project** e nomeie como `wapassist`
 3. Selecione a região: **AWS São Paulo (sa-east-1)**
 4. Após criar, clique em **Connection Details** e copie a **Connection String**
 
 O formato da string é:
 ```
-postgresql://usuario:senha@host.neon.tech/itaflix?sslmode=require
+postgresql://usuario:senha@host.neon.tech/wapassist?sslmode=require
 ```
 
 > ⚠️ Salve essa string em local seguro. Ela será usada como `DATABASE_URL` no `.env` do backend.
@@ -32,7 +32,7 @@ postgresql://usuario:senha@host.neon.tech/itaflix?sslmode=require
 ### Checklist
 
 - [ ] Conta Neon.tech criada
-- [ ] Projeto `itaflix` criado na região `sa-east-1`
+- [ ] Projeto `wapassist` criado na região `sa-east-1`
 - [ ] Connection String copiada e salva com segurança
 - [ ] `DATABASE_URL` preenchida no `.env` do backend
 

@@ -10,7 +10,7 @@
 ## Estrutura de Arquivos
 
 ```
-itaflix-api/
+wapassist-api/
 ├── src/
 │   ├── server.js              # Entry point — registra plugins, rotas e inicia o servidor
 │   ├── prisma.js              # Singleton do PrismaClient
@@ -40,7 +40,7 @@ itaflix-api/
 ## Etapa 3.1 — Criar o Projeto e Instalar Dependências
 
 ```bash
-mkdir itaflix-api && cd itaflix-api
+mkdir wapassist-api && cd wapassist-api
 npm init -y
 npm install fastify @fastify/cors @fastify/jwt dotenv
 npm install @prisma/client mercadopago node-cron axios date-fns
@@ -101,7 +101,7 @@ startScheduler();
 
 const port = Number(process.env.PORT) || 3000;
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`Servidor Itaflix rodando na porta ${port}`);
+console.log(`Servidor wapassist rodando na porta ${port}`);
 ```
 
 ---
@@ -226,7 +226,7 @@ export async function sendBillingReminder(phone, name, dueDate, pixLink) {
   const data = new Date(dueDate).toLocaleDateString('pt-BR');
   await sendMessage(phone,
     `Olá, *${name}*! 👋\n` +
-    `Sua assinatura *Itaflix* vence amanhã, *${data}*.\n\n` +
+    `Sua assinatura *wapassist* vence amanhã, *${data}*.\n\n` +
     `Para renovar, pague o Pix abaixo:\n` +
     `🔗 ${pixLink}\n\n` +
     `O link expira em 48 horas. Qualquer dúvida é só chamar! 😊`
@@ -242,12 +242,12 @@ export async function sendPaymentConfirmation(phone, name, newDueDate, plan) {
     `Recebemos seu pagamento com sucesso.\n\n` +
     `📅 Nova validade: *${data}*\n` +
     `📦 Plano: ${label}\n\n` +
-    `Bom entretenimento! 🎬\n— Equipe Itaflix`
+    `Bom entretenimento! 🎬\n— Equipe wapassist`
   );
 }
 
 export async function sendAdminAlert(message) {
-  await sendMessage(ADMIN, `⚠️ *Alerta Itaflix*\n\n${message}`);
+  await sendMessage(ADMIN, `⚠️ *Alerta wapassist*\n\n${message}`);
 }
 ```
 
@@ -405,7 +405,7 @@ cron.schedule('0 9 * * *', async () => {
   for (const client of clients) {
     try {
       const pixLink = await createPixLink({
-        title: `Itaflix - Renovação ${getPlanLabel(client.plan)}`,
+        title: `wapassist - Renovação ${getPlanLabel(client.plan)}`,
         amount: getPlanPrice(client.plan),
         externalReference: client.phone,
       });

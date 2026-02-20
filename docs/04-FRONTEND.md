@@ -24,8 +24,8 @@
 ## Etapa 4.1 — Criar e Configurar o Projeto
 
 ```bash
-npm create vite@latest itaflix-dashboard -- --template react
-cd itaflix-dashboard
+npm create vite@latest wapassist-dashboard -- --template react
+cd wapassist-dashboard
 npm install
 npm install axios react-router-dom @tanstack/react-query date-fns
 npm install lucide-react react-input-mask
@@ -161,7 +161,7 @@ export const api = axios.create({
 
 // Injeta JWT em todas as requisições
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('itaflix_token');
+  const token = localStorage.getItem('wapassist_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -171,7 +171,7 @@ api.interceptors.response.use(
   res => res,
   err => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('itaflix_token');
+      localStorage.removeItem('wapassist_token');
       window.location.href = '/login';
     }
     return Promise.reject(err);
@@ -221,7 +221,7 @@ PrivateRoute: se não tiver JWT no localStorage → redireciona para /login
 │  SIDEBAR (240px fixo)           │  MAIN AREA (flex-1)                  │
 │  ──────────────────────────     │  ──────────────────────────────────  │
 │                                 │  TOPBAR (60px)                       │
-│  ◈  ITAFLIX          [logo]     │  [Título da página]   [avatar] [⚙️]  │
+│  ◈  WAPASSIST          [logo]     │  [Título da página]   [avatar] [⚙️]  │
 │  ─────────────────────────      │  ────────────────────────────────    │
 │                                 │                                       │
 │  ≡  Visão Geral                 │  CONTEÚDO DA PÁGINA                  │
@@ -249,7 +249,7 @@ PrivateRoute: se não tiver JWT no localStorage → redireciona para /login
 │              efeito: grid pattern sutil em ciano               │
 │                                                                │
 │                  ┌──────────────────────┐                     │
-│                  │   ◈  ITAFLIX          │                    │
+│                  │   ◈  WAPASSIST          │                    │
 │                  │   Acesse sua conta    │                    │
 │                  │                       │                    │
 │                  │   [🔒 Senha ·········] │                   │
@@ -490,14 +490,14 @@ export function useClientFilters(clients = []) {
 ## Etapa 4.13 — Deploy na Vercel
 
 1. Acesse [vercel.com](https://vercel.com) e crie uma conta gratuita
-2. Clique em **Add New > Project** e importe o repositório `itaflix-dashboard`
+2. Clique em **Add New > Project** e importe o repositório `wapassist-dashboard`
 3. Framework Preset: **Vite** (detectado automaticamente)
 4. Adicione a variável de ambiente:
    ```
-   VITE_API_URL = https://itaflix-api.onrender.com
+   VITE_API_URL = https://wapassist-api.onrender.com
    ```
 5. Clique em **Deploy**
-6. (Opcional) Em **Settings > Domains**, adicione `admin.itaflix.com.br`
+6. (Opcional) Em **Settings > Domains**, adicione `admin.wapassist.com.br`
 
 > 💡 Todo `git push` para `main` dispara redeploy automático na Vercel.
 
