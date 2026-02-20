@@ -51,23 +51,28 @@ O wapassist é uma aplicação web **privada e de uso pessoal** para gerenciar u
         ↓
 [2] node-cron roda às 09h — identifica clientes com vencimento amanhã
         ↓
-[3] Gera link Pix via Mercado Pago (external_reference = telefone do cliente)
+[3] Envia link da página de pagamento via WhatsApp
+        URL: FRONTEND_URL/pay/{payToken} (token único por cliente)
         ↓
-[4] Envia cobrança via WhatsApp (Evolution API)
+[4] Cliente abre a página → vê plano, valor e dias restantes
         ↓
-[5] Cliente paga o Pix
+[5] Cliente clica "Gerar PIX" → API cria pagamento PIX nativo no MP
         ↓
-[6] Mercado Pago dispara webhook para o backend
+[6] Página exibe código copia-e-cola (destaque) + QR Code opcional
         ↓
-[7] Backend identifica o cliente pelo external_reference
+[7] Cliente paga o PIX
         ↓
-[8] Calcula nova data de vencimento (regra de negócio — ver abaixo)
+[8] Mercado Pago dispara webhook para o backend
         ↓
-[9] Atualiza banco de dados (status = ACTIVE, nova due_date)
+[9] Backend identifica o cliente pelo external_reference (phone)
         ↓
-[10] Envia confirmação de pagamento via WhatsApp para o cliente
+[10] Calcula nova data de vencimento (regra de negócio — ver abaixo)
         ↓
-[11] Dashboard atualiza em tempo real
+[11] Atualiza banco de dados (status = ACTIVE, nova due_date)
+        ↓
+[12] Envia confirmação de pagamento via WhatsApp para o cliente
+        ↓
+[13] Dashboard atualiza em tempo real
 ```
 
 ---
@@ -150,7 +155,7 @@ ADMIN_PHONE=<seu número: 5521999998888>
 
 # App
 PORT=3000
-FRONTEND_URL=https://admin.wapassist.com.br
+FRONTEND_URL=https://admin.wapassist.com.br  # ⚠️ CRÍTICO: usado para gerar links /pay/:token no WhatsApp
 ```
 
 Variável necessária para o frontend (`.env.local`):

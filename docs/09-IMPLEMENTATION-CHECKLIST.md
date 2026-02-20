@@ -1,7 +1,7 @@
 # 09 — Checklist Mestre de Implementação
 
 > **Como usar:** Marque cada item com `[x]` conforme for concluindo. Siga a ordem das fases — cada fase depende da anterior estar completa.  
-> **Última atualização:** 20/02/2026
+> **Última atualização:** 20/02/2026 (sessão 2)
 
 ---
 
@@ -65,7 +65,7 @@
 - [x] `src/middleware/auth.js` — verificação JWT
 - [x] `src/services/billing.js` — `calculateNewDueDate` com 31 dias/mês fixo
 - [x] `src/services/whatsapp.js` — 5 funções: billing, confirmation, overdue, adminAlert, eventNotification
-- [x] `src/services/mercadopago.js` — `createPixLink`, `getPayment`
+- [x] `src/services/mercadopago.js` — `createPixPayment` (PIX nativo), `getPayment`
 
 ### 3.3 — Rotas
 - [x] `src/routes/auth.js` — login + me
@@ -75,7 +75,8 @@
 - [x] `src/routes/events.js` — CRUD de eventos
 - [x] `src/routes/dashboard.js` — summary KPIs
 - [x] `src/routes/whatsapp.js` — status + qrcode
-- [x] `src/server.js` — entry point com todas as rotas
+- [x] `src/routes/pay.js` — rotas públicas `GET /pay/:token` e `POST /pay/:token/pix`
+- [x] `src/server.js` — entry point com todas as rotas (CORS aberto para rotas públicas)
 
 ### 3.4 — Scheduler
 - [x] Job 1: cobrança D-1 às 09h
@@ -89,6 +90,9 @@
 - [x] `GET /api/clients/:id/logs` — logs por cliente
 - [x] `GET /api/whatsapp/qrcode` — retorna QR Code para reconexão
 - [x] Preço customizado por cliente (`price` field no Client)
+- [x] `payToken` no model Client — token único (cuid) para URL pública de pagamento
+- [x] PIX nativo via `Payment` API do MP (substituiu `Preference`/link de checkout)
+- [x] Página pública `/pay/:token` — standalone, sem auth, com copia-e-cola + QR Code opcional
 
 ---
 
@@ -132,6 +136,7 @@
 - [x] `/calendario` — calendário de eventos
 - [x] `/templates` — templates editáveis com localStorage, restore-to-default
 - [x] `/logs` — logs reais do DB, compacto, filtros por tipo, auto-refresh 30s
+- [x] `/pay/:token` — **pública, sem auth** — página de pagamento PIX por cliente (copia-e-cola + QR Code colapsável)
 
 ### 4.5 — Hooks
 - [x] `useClientFilters.js` — filtros e paginação
@@ -154,9 +159,14 @@
 
 - [x] `wapassist-api` commitado no GitHub (branch `develop`)
 - [x] `wapassist-dashboard` commitado no GitHub (branch `main`)
+- [ ] **Merge `develop` → `main`** no `wapassist-api`
 - [ ] **Backend deployado no Render** — ação humana pendente
+  - Build: `npm install && npx prisma generate && npx prisma migrate deploy`
+  - Start: `npm start`
+  - Env var crítica: `FRONTEND_URL=https://adminwapassist.yootiq.com`
 - [ ] `GET https://wapassist-api.onrender.com/health` retorna `{ status: 'ok' }`
 - [ ] **Frontend deployado na Vercel** — ação humana pendente
+  - Env var: `VITE_API_URL=https://wapassist-api.onrender.com`
 - [ ] Dashboard acessível pela URL da Vercel
 - [ ] **UptimeRobot** configurado pingando `/health` a cada 5 min
 - [ ] Webhook MP atualizado para URL do Render
@@ -218,8 +228,8 @@
 | Fase 0 — Pré-requisitos | ✅ Concluído | Número WA ainda provisório |
 | Fase 1 — Infraestrutura | ✅ Concluído | CNAME Vercel pendente |
 | Fase 2 — Banco de Dados | ✅ Concluído | 6 tabelas incluindo ClientLog |
-| Fase 3 — Backend Core | ✅ Concluído | branch `develop` |
-| Fase 4 — Frontend | ✅ Concluído | branch `main`, build ok |
+| Fase 3 — Backend Core | ✅ Concluído | branch `develop` + página PIX |
+| Fase 4 — Frontend | ✅ Concluído | branch `main`, build ok + `/pay/:token` |
 | Fase 5 — Integrações | 🔨 Em andamento | Webhook MP pendente |
 | Fase 6 — Deploy | ⏳ Pendente | Ação humana: Render + Vercel |
 | Fase 7 — Validação | ⬜ Pendente | Após deploy |
