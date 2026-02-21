@@ -220,14 +220,24 @@ Após o deploy completo, validar o fluxo end-to-end:
 
 ## Referência: URLs do Sistema em Produção
 
-| Serviço | URL |
-|---|---|
-| Dashboard (admin) | `https://admin.wapassist.com.br` |
-| Backend API | `https://wapassist-api.onrender.com` |
-| Health check | `https://wapassist-api.onrender.com/health` |
-| Webhook MP | `https://wapassist-api.onrender.com/api/webhook/mercadopago` |
-| Evolution API | `https://api.wapassist.com.br` |
-| Prisma Studio (local) | `http://localhost:5555` |
+> **Deploy realizado em 20/02/2026 — tudo no ar ✅**
+
+| Serviço | URL | Status |
+|---|---|---|
+| Dashboard (domínio) | `https://adminwapassist.yootiq.com` | ✅ Live |
+| Dashboard (Vercel) | `https://wapassist-dashboard.vercel.app` | ✅ Live |
+| Backend API | `https://wapassist-api.onrender.com` | ✅ Live |
+| Health check | `https://wapassist-api.onrender.com/health` | ✅ OK |
+| Webhook MP | `https://wapassist-api.onrender.com/api/webhook/mercadopago` | ✅ OK |
+| Evolution API | `https://apiwapassist.yootiq.com` | ✅ Externo |
+| Prisma Studio (local) | `http://localhost:5555` | local only |
+
+### Notas críticas para o próximo deploy
+
+- **Vercel branch de produção:** `feat/frontend-base` (não `main`). Push para essa branch dispara redeploy.
+- **Prisma:** versão `5.22.0` fixada em `dependencies` no `package.json`. **Nunca mover para `devDependencies`** — o Render não instala devDeps em produção.
+- **Build command no Render:** `npm install && npx prisma generate && npx prisma migrate deploy`
+- **`FRONTEND_URL` no Render:** deve ser `https://wapassist-dashboard.vercel.app` (usado para gerar links `/pay/:token` nas mensagens WhatsApp)
 
 ---
 
