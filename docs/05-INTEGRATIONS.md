@@ -43,22 +43,31 @@
 
 ---
 
-### Etapa 5.3 — Como Funciona o Link Pix
+### Etapa 5.3 — Como Funciona o PIX Nativo
 
-Cada cobrança gera um link Pix **personalizado por cliente**. O campo `external_reference` é o telefone do cliente, permitindo identificar automaticamente quem pagou quando o webhook chegar.
+O sistema utiliza **PIX nativo** do Mercado Pago, gerando QR Code diretamente na página de pagamento. O fluxo é:
 
 ```
-[Scheduler D-1]
+[Scheduler D-1 ou Admin clica "Enviar cobrança"]
     │
-    ├── Cria Preference no Mercado Pago
-    │     ├── title: "wapassist - Renovação Mensal"
-    │     ├── amount: 30.00
-    │     ├── external_reference: "5521999998888"  ← telefone do cliente
-    │     └── expiration: +48 horas
+    ├── Gera payToken único (6 chars alfanuméricos)
     │
-    └── Retorna init_point (URL do checkout Pix)
+    ├── Envia link via WhatsApp: FRONTEND_URL/pay/{payToken}
+    │
+    └── Cliente acessa página de pagamento
               │
-              └── Enviado via WhatsApp para o cliente
+              ├── GET /pay/:token → retorna dados do cliente
+              │
+              ├── Cliente clica "Gerar PIX"
+              │
+              ├── POST /pay/:token/pix → createPixPayment()
+              │     ├── description: "wapassist - Renovação Mensal"
+              │     ├── amount: 30.00
+              │     ├── payment_method_id: "pix"
+              │     ├── external_reference: "5521999998888"  ← telefone
+              │     └── expiration: +24 horas
+              │
+              └── Retorna qrCode (copia-e-cola) + qrCodeBase64 (imagem)
 ```
 
 **Fluxo de identificação no webhook:**
@@ -123,9 +132,8 @@ Olá, *{NOME}*! 👋
 
 Sua assinatura *wapassist* vence amanhã, *{DATA}*.
 
-Para renovar, pague o Pix abaixo:
-💰 Valor: R$ {VALOR}
-🔗 Link: {LINK_PIX}
+Para renovar, acesse o link abaixo e gere seu PIX:
+🔗 {FRONTEND_URL}/pay/{PAYTOKEN}
 
 O link expira em 48 horas.
 Qualquer dúvida é só chamar! 😊
@@ -181,6 +189,42 @@ Mesmo template da Cobrança D-1, mas disparado manualmente via `POST /api/client
 
 ---
 
+### Rotas de Pagamento Público
+
+#### GET /pay/:token
+
+Rota **pública** (sem autenticação JWT) que retorna informações do cliente para exibição na página de pagamento.
+
+**Resposta:**
+```json
+{
+  "name": "João Silva",
+  "plan": "MONTHLY",
+  "planLabel": "Mensal",
+  "amount": 30.00,
+  "status": "ACTIVE",
+  "dueDate": "2026-03-15",
+  "daysUntilDue": 24
+}
+```
+
+#### POST /pay/:token/pix
+
+Rota **pública** que gera o PIX nativo no Mercado Pago.
+
+**Resposta:**
+```json
+{
+  "mpPaymentId": "123456789",
+  "qrCode": "00020126580014br.gov.bcb.pix...",
+  "qrCodeBase64": "data:image/png;base64,iVBORw0KGgo...",
+  "expiresAt": "2026-02-22T10:30:00.000Z",
+  "amount": 30.00
+}
+```
+
+---
+
 ### Etapa 5.6 — Verificar Status da Instância
 
 A sidebar da dashboard exibe o status da conexão WhatsApp em tempo real. O backend expõe:
@@ -228,4 +272,6 @@ curl -X POST "https://api.wapassist.com.br/instance/connect/wapassist" \
 - [ ] `EVOLUTION_APIKEY`, `EVOLUTION_URL`, `EVOLUTION_INSTANCE` configurados no `.env`
 - [ ] `ADMIN_PHONE` configurado com seu número pessoal
 - [ ] Mensagem de teste enviada com sucesso via WhatsApp
-- [ ] Teste end-to-end: Pix pago → webhook processado → WhatsApp enviado
+- [ ] Teste end-to-end: Link enviado → Página aberta → PIX gerado → Pago → Webhook processado → WhatsApp enviado
+- [ ] Página de pagamento `/pay/:token` funcionando sem autenticação
+- [ ] QR Code exibido corretamente (copia-e-cola + imagem base64)

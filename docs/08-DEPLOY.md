@@ -65,23 +65,24 @@ git push -u origin main
 | Campo | Valor |
 |---|---|
 | **Runtime** | Node |
-| **Build Command** | `npm install && npx prisma generate` |
+| **Build Command** | `npm install && npx prisma generate && npx prisma migrate deploy` |
 | **Start Command** | `node src/server.js` |
 | **Plan** | Free |
 
 5. Adicione todas as variáveis de ambiente (aba **Environment Variables**):
 
 ```env
-DATABASE_URL          = (connection string do Neon.tech)
+DATABASE_URL          = postgresql://...@ep-raspy-mud-acoglp71-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+DIRECT_URL            = postgresql://...@ep-raspy-mud-acoglp71.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 JWT_SECRET            = (openssl rand -hex 32)
 ADMIN_PASSWORD        = (sua senha forte)
-MP_ACCESS_TOKEN       = (do painel Mercado Pago — produção, começa com APP_USR-)
+ADMIN_PHONE           = 5522997309370
+MP_ACCESS_TOKEN       = APP_USR-...
 MP_WEBHOOK_SECRET     = (do painel Mercado Pago — webhooks)
-EVOLUTION_URL         = https://api.wapassist.com.br
+EVOLUTION_URL         = https://apiwapassist.yootiq.com
 EVOLUTION_APIKEY      = (sua chave da Evolution API)
 EVOLUTION_INSTANCE    = wapassist
-ADMIN_PHONE           = (seu número: 5521999998888)
-FRONTEND_URL          = https://admin.wapassist.com.br
+FRONTEND_URL          = https://adminwapassist.yootiq.com
 PORT                  = 3000
 ```
 
@@ -102,12 +103,13 @@ curl https://wapassist-api.onrender.com/health
 
 - [ ] Conta Render criada
 - [ ] Web Service criado e conectado ao repositório `wapassist-api`
-- [ ] Build Command: `npm install && npx prisma generate`
+- [ ] Build Command: `npm install && npx prisma generate && npx prisma migrate deploy`
 - [ ] Start Command: `node src/server.js`
-- [ ] Todas as variáveis de ambiente configuradas no Render
+- [ ] Todas as variáveis de ambiente configuradas no Render (incluindo DIRECT_URL)
 - [ ] Primeiro deploy concluído sem erros
 - [ ] `GET /health` retorna `{ status: 'ok' }`
 - [ ] URL do webhook cadastrada no Mercado Pago
+- [ ] Prisma v5.22.0 em dependencies (não devDependencies)
 
 ---
 
@@ -224,20 +226,24 @@ Após o deploy completo, validar o fluxo end-to-end:
 
 | Serviço | URL | Status |
 |---|---|---|
-| Dashboard (domínio) | `https://adminwapassist.yootiq.com` | ✅ Live |
-| Dashboard (Vercel) | `https://wapassist-dashboard.vercel.app` | ✅ Live |
-| Backend API | `https://wapassist-api.onrender.com` | ✅ Live |
-| Health check | `https://wapassist-api.onrender.com/health` | ✅ OK |
-| Webhook MP | `https://wapassist-api.onrender.com/api/webhook/mercadopago` | ✅ OK |
-| Evolution API | `https://apiwapassist.yootiq.com` | ✅ Externo |
-| Prisma Studio (local) | `http://localhost:5555` | local only |
+| **Dashboard (domínio)** | `https://adminwapassist.yootiq.com` | ✅ Live |
+| **Dashboard (Vercel)** | `https://wapassist-dashboard.vercel.app` | ✅ Live |
+| **Backend API** | `https://wapassist-api.onrender.com` | ✅ Live |
+| **Health check** | `https://wapassist-api.onrender.com/health` | ✅ OK |
+| **Webhook MP** | `https://wapassist-api.onrender.com/api/webhook/mercadopago` | ✅ OK |
+| **Página de Pagamento** | `https://adminwapassist.yootiq.com/pay/:token` | ✅ Live |
+| **Evolution API** | `https://apiwapassist.yootiq.com` | ✅ Externo |
+| **UptimeRobot** | Monitor ID 802393905 | ✅ Ativo |
+| **Prisma Studio (local)** | `http://localhost:5555` | local only |
 
 ### Notas críticas para o próximo deploy
 
-- **Vercel branch de produção:** `feat/frontend-base` (não `main`). Push para essa branch dispara redeploy.
+- **Vercel branch de produção:** `main` (feat/frontend-base foi mergeada em 20/02/2026)
 - **Prisma:** versão `5.22.0` fixada em `dependencies` no `package.json`. **Nunca mover para `devDependencies`** — o Render não instala devDeps em produção.
 - **Build command no Render:** `npm install && npx prisma generate && npx prisma migrate deploy`
-- **`FRONTEND_URL` no Render:** deve ser `https://wapassist-dashboard.vercel.app` (usado para gerar links `/pay/:token` nas mensagens WhatsApp)
+- **DIRECT_URL:** Obrigatório no Render para evitar erro P1002 ao rodar migrations no pooler
+- **`FRONTEND_URL` no Render:** deve ser `https://adminwapassist.yootiq.com` (usado para gerar links `/pay/:token` nas mensagens WhatsApp)
+- **payToken:** Gerado no app com 6 chars alfanuméricos, não usa @default(cuid()) do Prisma
 
 ---
 

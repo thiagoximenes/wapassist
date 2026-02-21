@@ -50,8 +50,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
@@ -92,14 +93,27 @@ model Client {
   phone     String       @unique @db.VarChar(20)  // formato: 5521999998888
   email     String?      @db.VarChar(100)
   plan      Plan
+  price     Decimal?     @db.Decimal(10, 2)       // preço customizado (opcional)
   status    ClientStatus @default(ACTIVE)
   dueDate   DateTime     @db.Date                 // próximo vencimento
+  payToken  String       @unique                  // token de 6 chars para link /pay/:token
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
   payments       Payment[]
   notes          Note[]
   calendarEvents CalendarEvent[]
+  logs           ClientLog[]
+}
+
+model ClientLog {
+  id        Int      @id @default(autoincrement())
+  clientId  Int
+  type      String   @db.VarChar(50)              // billing_sent, payment_received, etc.
+  message   String
+  createdAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id])
 }
 
 model Payment {
@@ -217,9 +231,22 @@ if (process.env.NODE_ENV !== 'production') {
 | `phone` | String (unique) | Telefone no formato `5521999998888` |
 | `email` | String? | E-mail (opcional) |
 | `plan` | Enum Plan | `MONTHLY` / `QUARTERLY` / `SEMIANNUAL` / `ANNUAL` |
+| `price` | Decimal? | Preço customizado (opcional, sobrescreve preço padrão do plano) |
 | `status` | Enum ClientStatus | `ACTIVE` / `OVERDUE` / `INACTIVE` |
 | `dueDate` | Date | Próxima data de vencimento |
+| `payToken` | String (unique) | Token de 6 caracteres alfanuméricos para link de pagamento |
 | `createdAt` | DateTime | Data de cadastro |
+| `updatedAt` | DateTime | Última atualização |
+
+### `ClientLog` — Logs de Atividades
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `id` | Int (PK) | ID auto-incremento |
+| `clientId` | Int (FK) | Referência ao cliente |
+| `type` | String | Tipo do log: `billing_sent`, `payment_received`, `confirmation_sent`, etc. |
+| `message` | String | Mensagem descritiva do evento |
+| `createdAt` | DateTime | Data/hora do log |
 
 ### `Payment` — Pagamentos
 
@@ -274,5 +301,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 - **Fuso horário:** Sempre use UTC no backend. Converta para `America/Sao_Paulo` apenas na exibição no frontend.
 - **Campo `dueDate`:** Salvo como `DATE` (sem hora). Nunca salvar com hora para evitar bugs de comparação.
+- **Campo `payToken`:** Gerado no app com 6 caracteres alfanuméricos (não usa `@default(cuid())` do Prisma). Deve ser único.
+- **Campo `price` customizado:** Permite definir preço específico por cliente, sobrescrevendo o preço padrão do plano.
+- **ClientLog:** Registra todas as operações importantes (cobranças enviadas, pagamentos recebidos, etc.) para auditoria.
+- **DIRECT_URL:** Necessário no schema.prisma para evitar erro P1002 ao rodar migrations no pooler do Neon.tech.
 - **Neon.tech free tier:** Suspende após 7 dias sem atividade. O UptimeRobot pingando o backend a cada 5 min evita isso automaticamente.
-- **Migrations vs `db push`:** Em desenvolvimento use `npx prisma db push`. Em produção, considere usar `prisma migrate deploy` para rastrear mudanças.
+- **Migrations vs `db push`:** Em desenvolvimento use `npx prisma db push`. Em produção, use `prisma migrate deploy` no build do Render.
