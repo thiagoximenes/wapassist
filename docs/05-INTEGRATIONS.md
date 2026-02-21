@@ -43,34 +43,25 @@
 
 ---
 
-### Etapa 5.3 — Como Funciona o PIX (Página Própria por Cliente)
+### Etapa 5.3 — Como Funciona o Link Pix
 
-Cada cliente tem uma **URL permanente e única** gerada na criação do cadastro. O campo `payToken` (cuid) é armazenado no banco e nunca muda. O PIX em si é gerado **sob demanda** quando o cliente clica no botão da página.
+Cada cobrança gera um link Pix **personalizado por cliente**. O campo `external_reference` é o telefone do cliente, permitindo identificar automaticamente quem pagou quando o webhook chegar.
 
 ```
-[Scheduler D-1 / Admin clica "Enviar cobrança"]
+[Scheduler D-1]
     │
-    └── Envia WhatsApp com link: FRONTEND_URL/pay/{payToken}
+    ├── Cria Preference no Mercado Pago
+    │     ├── title: "wapassist - Renovação Mensal"
+    │     ├── amount: 30.00
+    │     ├── external_reference: "5521999998888"  ← telefone do cliente
+    │     └── expiration: +48 horas
+    │
+    └── Retorna init_point (URL do checkout Pix)
               │
-              └── Cliente abre a página → vê plano, valor, dias restantes
-                        │
-                        └── Clica "Gerar PIX"
-                                  │
-                                  └── POST /pay/:token/pix → createPixPayment()
-                                            │
-                                            ├── Cria Payment no MP (PIX nativo)
-                                            │     ├── payment_method_id: 'pix'
-                                            │     ├── external_reference: phone do cliente
-                                            │     ├── payer.email: slug@wapassist.com
-                                            │     └── date_of_expiration: +24h
-                                            │
-                                            └── Retorna qrCode + qrCodeBase64
-                                                      │
-                                                      ├── Código copia-e-cola (destaque)
-                                                      └── QR Code (colapsável, opcional)
+              └── Enviado via WhatsApp para o cliente
 ```
 
-**Fluxo de identificação no webhook (não mudou):**
+**Fluxo de identificação no webhook:**
 
 ```
 MP chama POST /api/webhook/mercadopago
@@ -79,8 +70,6 @@ MP chama POST /api/webhook/mercadopago
     │
     └── prisma.client.findUnique({ where: { phone: "5521999998888" } })
 ```
-
-> ℹ️ O webhook continua funcionando exatamente igual — o `external_reference` ainda é o telefone do cliente.
 
 ### Preços por Plano (configuráveis em `billing.js`)
 
@@ -131,15 +120,16 @@ Todos os templates são definidos em `src/services/whatsapp.js`. Abaixo estão o
 
 ```
 Olá, *{NOME}*! 👋
+
 Sua assinatura *wapassist* vence amanhã, *{DATA}*.
 
 Para renovar, pague o Pix abaixo:
-🔗 {LINK_PAGAMENTO}
+💰 Valor: R$ {VALOR}
+🔗 Link: {LINK_PIX}
 
-O link expira em 48 horas. Qualquer dúvida é só chamar! 😊
+O link expira em 48 horas.
+Qualquer dúvida é só chamar! 😊
 ```
-
-> ℹ️ `{LINK_PAGAMENTO}` = `FRONTEND_URL/pay/{payToken}` — página própria do cliente onde ele gera o PIX e copia o código.
 
 ---
 

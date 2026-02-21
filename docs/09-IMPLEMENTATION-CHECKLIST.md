@@ -1,7 +1,7 @@
 # 09 — Checklist Mestre de Implementação
 
 > **Como usar:** Marque cada item com `[x]` conforme for concluindo. Siga a ordem das fases — cada fase depende da anterior estar completa.  
-> **Última atualização:** 20/02/2026 (sessão 2)
+> **Última atualização:** 21/02/2026
 
 ---
 
@@ -14,7 +14,7 @@
 - [x] **Conta Vercel** — conta criada + MCP vinculado
 - [x] **Conta Mercado Pago** — Access Token de produção ativo
 - [x] **Conta UptimeRobot** — conta criada
-- [ ] **Número WhatsApp dedicado** — usando número provisório `5522992116841`
+- [x] **Número WhatsApp dedicado** — usando número `5522997309370` (mesmo do admin)
 
 ---
 
@@ -28,7 +28,7 @@
 
 ### 1.2 — DNS (Cloudflare — yootiq.com)
 - [x] `apiwapassist.yootiq.com` → A → `72.61.57.129` (propagado)
-- [ ] `adminwapassist.yootiq.com` → CNAME → Vercel (pendente após deploy)
+- [x] `adminwapassist.yootiq.com` → CNAME → Vercel ✅
 
 ### 1.3 — Evolution API
 - [x] Container `evolution_api` rodando (v1.8.7)
@@ -65,7 +65,7 @@
 - [x] `src/middleware/auth.js` — verificação JWT
 - [x] `src/services/billing.js` — `calculateNewDueDate` com 31 dias/mês fixo
 - [x] `src/services/whatsapp.js` — 5 funções: billing, confirmation, overdue, adminAlert, eventNotification
-- [x] `src/services/mercadopago.js` — `createPixPayment` (PIX nativo), `getPayment`
+- [x] `src/services/mercadopago.js` — `createPixLink`, `getPayment`
 
 ### 3.3 — Rotas
 - [x] `src/routes/auth.js` — login + me
@@ -75,8 +75,7 @@
 - [x] `src/routes/events.js` — CRUD de eventos
 - [x] `src/routes/dashboard.js` — summary KPIs
 - [x] `src/routes/whatsapp.js` — status + qrcode
-- [x] `src/routes/pay.js` — rotas públicas `GET /pay/:token` e `POST /pay/:token/pix`
-- [x] `src/server.js` — entry point com todas as rotas (CORS aberto para rotas públicas)
+- [x] `src/server.js` — entry point com todas as rotas
 
 ### 3.4 — Scheduler
 - [x] Job 1: cobrança D-1 às 09h
@@ -90,9 +89,6 @@
 - [x] `GET /api/clients/:id/logs` — logs por cliente
 - [x] `GET /api/whatsapp/qrcode` — retorna QR Code para reconexão
 - [x] Preço customizado por cliente (`price` field no Client)
-- [x] `payToken` no model Client — token único (cuid) para URL pública de pagamento
-- [x] PIX nativo via `Payment` API do MP (substituiu `Preference`/link de checkout)
-- [x] Página pública `/pay/:token` — standalone, sem auth, com copia-e-cola + QR Code opcional
 
 ---
 
@@ -136,7 +132,6 @@
 - [x] `/calendario` — calendário de eventos
 - [x] `/templates` — templates editáveis com localStorage, restore-to-default
 - [x] `/logs` — logs reais do DB, compacto, filtros por tipo, auto-refresh 30s
-- [x] `/pay/:token` — **pública, sem auth** — página de pagamento PIX por cliente (copia-e-cola + QR Code colapsável)
 
 ### 4.5 — Hooks
 - [x] `useClientFilters.js` — filtros e paginação
@@ -148,36 +143,33 @@
 - [x] `EVOLUTION_APIKEY`, `EVOLUTION_URL`, `EVOLUTION_INSTANCE` configurados
 - [x] `ADMIN_PHONE` configurado
 - [x] MP_ACCESS_TOKEN configurado
-- [ ] **Webhook MP cadastrado no painel** — pendente após Render deploy
-- [ ] **`MP_WEBHOOK_SECRET`** — pendente após Render deploy
-- [ ] Mensagem de cobrança testada em produção
-- [ ] Confirmação testada via webhook real
+- [x] **Webhook MP cadastrado no painel** — `https://wapassist-api.onrender.com/api/webhook/mercadopago`
+- [x] **`MP_WEBHOOK_SECRET`** — configurado no Render
+- [x] Mensagem de cobrança testada em produção
+- [ ] Confirmação testada via webhook real (PIX end-to-end pendente)
 
 ---
 
 ## Fase 6 — Deploy ⏳
 
-- [x] `wapassist-api` commitado no GitHub (branch `develop`)
-- [x] `wapassist-dashboard` commitado no GitHub (branch `main`)
-- [ ] **Merge `develop` → `main`** no `wapassist-api`
-- [ ] **Backend deployado no Render** — ação humana pendente
-  - Build: `npm install && npx prisma generate && npx prisma migrate deploy`
-  - Start: `npm start`
-  - Env var crítica: `FRONTEND_URL=https://adminwapassist.yootiq.com`
-- [ ] `GET https://wapassist-api.onrender.com/health` retorna `{ status: 'ok' }`
-- [ ] **Frontend deployado na Vercel** — ação humana pendente
-  - Env var: `VITE_API_URL=https://wapassist-api.onrender.com`
-- [ ] Dashboard acessível pela URL da Vercel
-- [ ] **UptimeRobot** configurado pingando `/health` a cada 5 min
-- [ ] Webhook MP atualizado para URL do Render
+- [x] `wapassist-api` no GitHub (branch `main`) ✅
+- [x] `wapassist-dashboard` no GitHub (branch `main`) ✅
+- [x] **Backend deployado no Render** — `https://wapassist-api.onrender.com` ✅
+- [x] `GET https://wapassist-api.onrender.com/health` retorna `{ status: 'ok' }` ✅
+- [x] **Frontend deployado na Vercel** — `https://adminwapassist.yootiq.com` ✅
+- [x] Dashboard acessível pela URL da Vercel ✅
+- [x] **UptimeRobot** configurado pingando `/health` a cada 5 min ✅
+- [x] Webhook MP atualizado para URL do Render ✅
+- [x] `DIRECT_URL` configurado no Render (sem pooler, para migrations Prisma) ✅
+- [ ] `FRONTEND_URL` no Render atualizar para `https://adminwapassist.yootiq.com` ⚠️ pendente
 
 ---
 
 ## Fase 7 — Validação End-to-End ⬜
 
-- [ ] Login na dashboard em produção funcionando
-- [ ] Cadastrar cliente de teste com telefone real
-- [ ] Enviar cobrança manual — mensagem WhatsApp recebida
+- [x] Login na dashboard em produção funcionando ✅
+- [x] Cadastrar cliente de teste com telefone real ✅
+- [x] Enviar cobrança manual — mensagem WhatsApp recebida ✅
 - [ ] Realizar pagamento Pix de teste
 - [ ] Webhook processado — log no Render confirma
 - [ ] Confirmação de pagamento recebida no WhatsApp
@@ -228,11 +220,11 @@
 | Fase 0 — Pré-requisitos | ✅ Concluído | Número WA ainda provisório |
 | Fase 1 — Infraestrutura | ✅ Concluído | CNAME Vercel pendente |
 | Fase 2 — Banco de Dados | ✅ Concluído | 6 tabelas incluindo ClientLog |
-| Fase 3 — Backend Core | ✅ Concluído | branch `develop` + página PIX |
-| Fase 4 — Frontend | ✅ Concluído | branch `main`, build ok + `/pay/:token` |
-| Fase 5 — Integrações | 🔨 Em andamento | Webhook MP pendente |
-| Fase 6 — Deploy | ⏳ Pendente | Ação humana: Render + Vercel |
-| Fase 7 — Validação | ⬜ Pendente | Após deploy |
+| Fase 3 — Backend Core | ✅ Concluído | branch `main` |
+| Fase 4 — Frontend | ✅ Concluído | branch `main`, Vercel auto-deploy ok |
+| Fase 5 — Integrações | 🔨 Em andamento | PIX end-to-end pendente |
+| Fase 6 — Deploy | ✅ Concluído | Render + Vercel em produção |
+| Fase 7 — Validação | 🔨 Em andamento | WhatsApp ok, PIX pendente |
 | Fase 8 — Calendário | ✅ Concluído | Backend + frontend |
 | Fase 9 — IA | ⬜ Pendente | Requer créditos OpenAI |
 | Fase 10 — Migração | ⬜ Pendente | Após validação |

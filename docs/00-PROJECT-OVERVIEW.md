@@ -51,28 +51,23 @@ O wapassist é uma aplicação web **privada e de uso pessoal** para gerenciar u
         ↓
 [2] node-cron roda às 09h — identifica clientes com vencimento amanhã
         ↓
-[3] Envia link da página de pagamento via WhatsApp
-        URL: FRONTEND_URL/pay/{payToken} (token único por cliente)
+[3] Gera link Pix via Mercado Pago (external_reference = telefone do cliente)
         ↓
-[4] Cliente abre a página → vê plano, valor e dias restantes
+[4] Envia cobrança via WhatsApp (Evolution API)
         ↓
-[5] Cliente clica "Gerar PIX" → API cria pagamento PIX nativo no MP
+[5] Cliente paga o Pix
         ↓
-[6] Página exibe código copia-e-cola (destaque) + QR Code opcional
+[6] Mercado Pago dispara webhook para o backend
         ↓
-[7] Cliente paga o PIX
+[7] Backend identifica o cliente pelo external_reference
         ↓
-[8] Mercado Pago dispara webhook para o backend
+[8] Calcula nova data de vencimento (regra de negócio — ver abaixo)
         ↓
-[9] Backend identifica o cliente pelo external_reference (phone)
+[9] Atualiza banco de dados (status = ACTIVE, nova due_date)
         ↓
-[10] Calcula nova data de vencimento (regra de negócio — ver abaixo)
+[10] Envia confirmação de pagamento via WhatsApp para o cliente
         ↓
-[11] Atualiza banco de dados (status = ACTIVE, nova due_date)
-        ↓
-[12] Envia confirmação de pagamento via WhatsApp para o cliente
-        ↓
-[13] Dashboard atualiza em tempo real
+[11] Dashboard atualiza em tempo real
 ```
 
 ---
@@ -104,7 +99,7 @@ SE cliente pagou DEPOIS do vencimento:
 
 | Fase | Status | Escopo |
 |---|---|---|
-| **MVP (Fase 1)** | 🔨 Em desenvolvimento | Dashboard CRUD, Pix automático, notificações WhatsApp |
+| **MVP (Fase 1)** | ✅ Em produção (21/02/2026) | Dashboard CRUD, Pix automático, notificações WhatsApp |
 | **Fase 2** | ⏳ Após MVP estável | Relatórios financeiros, histórico por cliente, múltiplos links Pix |
 | **Fase 3 — IA** | 🔮 Futuro (3–6 meses) | Comandos por texto/voz no WhatsApp, assistente inteligente |
 
@@ -125,9 +120,9 @@ wapassist-dashboard/    → Frontend (React + Vite + TailwindCSS)
 
 | Subdomínio | Destino | Função |
 |---|---|---|
-| `api.wapassist.com.br` | VPS (Nginx → Evolution API porta 8080) | WhatsApp API |
-| `admin.wapassist.com.br` | Vercel (frontend) | Dashboard admin |
-| `wapassist-api.onrender.com` | Render (backend) | API REST + webhooks |
+| `apiwapassist.yootiq.com` | VPS (Nginx → Evolution API porta 8080) | WhatsApp API ✅ |
+| `adminwapassist.yootiq.com` | Vercel (frontend) | Dashboard admin ✅ |
+| `wapassist-api.onrender.com` | Render (backend) | API REST + webhooks ✅ |
 
 ---
 
@@ -137,25 +132,26 @@ Todas as variáveis necessárias para o backend (`.env`):
 
 ```env
 # Banco de dados
-DATABASE_URL=postgresql://usuario:senha@host.neon.tech/wapassist?sslmode=require
+DATABASE_URL=postgresql://...@ep-raspy-mud-acoglp71-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require
+DIRECT_URL=postgresql://...@ep-raspy-mud-acoglp71.sa-east-1.aws.neon.tech/neondb?sslmode=require  # sem pooler, para migrations
 
 # Autenticação
 JWT_SECRET=<openssl rand -hex 32>
 ADMIN_PASSWORD=<senha forte>
+ADMIN_PHONE=<seu número: 5522997309370>
 
 # Mercado Pago
 MP_ACCESS_TOKEN=<token de PRODUÇÃO — começa com APP_USR->
 MP_WEBHOOK_SECRET=<secret gerado no painel MP>
 
 # Evolution API (WhatsApp)
-EVOLUTION_URL=https://api.wapassist.com.br
+EVOLUTION_URL=https://apiwapassist.yootiq.com
 EVOLUTION_APIKEY=<chave gerada no docker-compose>
 EVOLUTION_INSTANCE=wapassist
-ADMIN_PHONE=<seu número: 5521999998888>
 
 # App
 PORT=3000
-FRONTEND_URL=https://admin.wapassist.com.br  # ⚠️ CRÍTICO: usado para gerar links /pay/:token no WhatsApp
+FRONTEND_URL=https://adminwapassist.yootiq.com
 ```
 
 Variável necessária para o frontend (`.env.local`):
